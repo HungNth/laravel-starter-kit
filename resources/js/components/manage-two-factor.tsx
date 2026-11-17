@@ -1,10 +1,10 @@
+import { Button } from '@heroui/react';
 import { Form } from '@inertiajs/react';
 import { ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
-import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import { disable, enable } from '@/routes/two-factor';
 
@@ -53,7 +53,7 @@ export default function ManageTwoFactor(props: Props) {
             />
             {twoFactorEnabled ? (
                 <div className="flex flex-col items-start justify-start space-y-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted">
                         You will be prompted for a secure, random pin during
                         login, which you can retrieve from the TOTP-supported
                         application on your phone.
@@ -63,9 +63,9 @@ export default function ManageTwoFactor(props: Props) {
                         <Form {...disable.form()}>
                             {({ processing }) => (
                                 <Button
-                                    variant="destructive"
+                                    variant="danger"
                                     type="submit"
-                                    disabled={processing}
+                                    isDisabled={processing}
                                 >
                                     Disable 2FA
                                 </Button>
@@ -81,7 +81,7 @@ export default function ManageTwoFactor(props: Props) {
                 </div>
             ) : (
                 <div className="flex flex-col items-start justify-start space-y-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted">
                         When you enable two-factor authentication, you will be
                         prompted for a secure pin during login. This pin can be
                         retrieved from a TOTP-supported application on your
@@ -100,7 +100,10 @@ export default function ManageTwoFactor(props: Props) {
                                 onSuccess={() => setShowSetupModal(true)}
                             >
                                 {({ processing }) => (
-                                    <Button type="submit" disabled={processing}>
+                                    <Button
+                                        type="submit"
+                                        isDisabled={processing}
+                                    >
                                         Enable 2FA
                                     </Button>
                                 )}

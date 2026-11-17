@@ -1,12 +1,10 @@
+import { Button, Input, Label } from '@heroui/react';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
 import type { Auth } from '@/types';
 import { send } from '@/routes/verification';
@@ -57,10 +55,13 @@ export default function Profile({
                                     required
                                     autoComplete="name"
                                     placeholder="Full name"
+                                    aria-invalid={Boolean(errors.name)}
+                                    aria-describedby="name-error"
                                 />
 
                                 <InputError
                                     className="mt-2"
+                                    id="name-error"
                                     message={errors.name}
                                 />
                             </div>
@@ -77,10 +78,13 @@ export default function Profile({
                                     required
                                     autoComplete="username"
                                     placeholder="Email address"
+                                    aria-invalid={Boolean(errors.email)}
+                                    aria-describedby="email-error"
                                 />
 
                                 <InputError
                                     className="mt-2"
+                                    id="email-error"
                                     message={errors.email}
                                 />
                             </div>
@@ -88,7 +92,7 @@ export default function Profile({
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
                                     <div>
-                                        <p className="-mt-4 text-sm text-muted-foreground">
+                                        <p className="-mt-4 text-sm text-muted">
                                             Your email address is unverified.{' '}
                                             <Link
                                                 href={send()}
@@ -102,7 +106,7 @@ export default function Profile({
 
                                         {status ===
                                             'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600">
+                                            <div className="mt-2 text-sm font-medium text-success">
                                                 A new verification link has been
                                                 sent to your email address.
                                             </div>
@@ -112,7 +116,8 @@ export default function Profile({
 
                             <div className="flex items-center gap-4">
                                 <Button
-                                    disabled={processing}
+                                    type="submit"
+                                    isDisabled={processing}
                                     data-test="update-profile-button"
                                 >
                                     Save

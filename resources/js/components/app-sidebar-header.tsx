@@ -1,18 +1,36 @@
+import { Button } from '@heroui/react';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { useAppSidebar } from '@/components/app-shell';
+import { useIsMobile } from '@/hooks/use-mobile';
+import type { BreadcrumbItem } from '@/types';
 
 export function AppSidebarHeader({
     breadcrumbs = [],
 }: {
-    breadcrumbs?: BreadcrumbItemType[];
+    breadcrumbs?: BreadcrumbItem[];
 }) {
+    const { expanded, mobileOpen, toggle } = useAppSidebar();
+    const isMobile = useIsMobile();
+    const isExpanded = isMobile ? mobileOpen : expanded;
     return (
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
-            <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1" />
-                <Breadcrumbs breadcrumbs={breadcrumbs} />
-            </div>
+        <header className="flex h-16 shrink-0 items-center gap-3 border-b border-separator px-4">
+            <Button
+                variant="ghost"
+                isIconOnly
+                size="sm"
+                onPress={toggle}
+                aria-label="Toggle sidebar"
+                aria-controls={isMobile ? 'app-sidebar-mobile' : 'app-sidebar'}
+                aria-expanded={isExpanded}
+            >
+                {isExpanded ? (
+                    <PanelLeftClose className="size-5" />
+                ) : (
+                    <PanelLeftOpen className="size-5" />
+                )}
+            </Button>
+            <Breadcrumbs breadcrumbs={breadcrumbs} />
         </header>
     );
 }

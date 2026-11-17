@@ -1,10 +1,7 @@
+import { Button, Input, Label, Spinner } from '@heroui/react';
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/password';
 
 type Props = {
@@ -35,8 +32,11 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 value={email}
                                 className="mt-1 block w-full"
                                 readOnly
+                                aria-invalid={Boolean(errors.email)}
+                                aria-describedby="email-error"
                             />
                             <InputError
+                                id="email-error"
                                 message={errors.email}
                                 className="mt-2"
                             />
@@ -52,8 +52,13 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 autoFocus
                                 placeholder="Password"
                                 passwordrules={passwordRules}
+                                aria-invalid={Boolean(errors.password)}
+                                aria-describedby="password-error"
                             />
-                            <InputError message={errors.password} />
+                            <InputError
+                                id="password-error"
+                                message={errors.password}
+                            />
                         </div>
 
                         <div className="grid gap-2">
@@ -67,8 +72,13 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 className="mt-1 block w-full"
                                 placeholder="Confirm password"
                                 passwordrules={passwordRules}
+                                aria-invalid={Boolean(
+                                    errors.password_confirmation,
+                                )}
+                                aria-describedby="password_confirmation-error"
                             />
                             <InputError
+                                id="password_confirmation-error"
                                 message={errors.password_confirmation}
                                 className="mt-2"
                             />
@@ -77,7 +87,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                         <Button
                             type="submit"
                             className="mt-4 w-full"
-                            disabled={processing}
+                            isDisabled={processing}
                             data-test="reset-password-button"
                         >
                             {processing && <Spinner />}

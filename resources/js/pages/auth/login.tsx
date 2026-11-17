@@ -1,12 +1,8 @@
+import { Button, Input, Label, Spinner, Checkbox } from '@heroui/react';
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -40,11 +36,15 @@ export default function Login({ status, canResetPassword }: Props) {
                                     name="email"
                                     required
                                     autoFocus
-                                    tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    aria-invalid={Boolean(errors.email)}
+                                    aria-describedby="email-error"
                                 />
-                                <InputError message={errors.email} />
+                                <InputError
+                                    id="email-error"
+                                    message={errors.email}
+                                />
                             </div>
 
                             <div className="grid gap-2">
@@ -54,7 +54,6 @@ export default function Login({ status, canResetPassword }: Props) {
                                         <TextLink
                                             href={request()}
                                             className="ml-auto text-sm"
-                                            tabIndex={5}
                                         >
                                             Forgot your password?
                                         </TextLink>
@@ -64,27 +63,32 @@ export default function Login({ status, canResetPassword }: Props) {
                                     id="password"
                                     name="password"
                                     required
-                                    tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    aria-invalid={Boolean(errors.password)}
+                                    aria-describedby="password-error"
                                 />
-                                <InputError message={errors.password} />
+                                <InputError
+                                    id="password-error"
+                                    message={errors.password}
+                                />
                             </div>
 
                             <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Checkbox name="remember">
+                                    <Checkbox.Content>
+                                        <Checkbox.Control>
+                                            <Checkbox.Indicator />
+                                        </Checkbox.Control>
+                                        <Label>Remember me</Label>
+                                    </Checkbox.Content>
+                                </Checkbox>
                             </div>
 
                             <Button
                                 type="submit"
                                 className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
+                                isDisabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
@@ -92,18 +96,16 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <div className="text-center text-sm text-muted">
                             Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
+                            <TextLink href={register()}>Sign up</TextLink>
                         </div>
                     </>
                 )}
             </Form>
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-4 text-center text-sm font-medium text-success">
                     {status}
                 </div>
             )}

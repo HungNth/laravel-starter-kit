@@ -1,11 +1,10 @@
+import { Button, Label } from '@heroui/react';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/security';
 import type { Props as ManagePasskeysProps } from '@/components/manage-passkeys';
 import ManagePasskeys from '@/components/manage-passkeys';
@@ -71,9 +70,16 @@ export default function Security(props: Props) {
                                     className="mt-1 block w-full"
                                     autoComplete="current-password"
                                     placeholder="Current password"
+                                    aria-invalid={Boolean(
+                                        errors.current_password,
+                                    )}
+                                    aria-describedby="current_password-error"
                                 />
 
-                                <InputError message={errors.current_password} />
+                                <InputError
+                                    id="current_password-error"
+                                    message={errors.current_password}
+                                />
                             </div>
 
                             <div className="grid gap-2">
@@ -87,9 +93,14 @@ export default function Security(props: Props) {
                                     autoComplete="new-password"
                                     placeholder="New password"
                                     passwordrules={props.passwordRules}
+                                    aria-invalid={Boolean(errors.password)}
+                                    aria-describedby="password-error"
                                 />
 
-                                <InputError message={errors.password} />
+                                <InputError
+                                    id="password-error"
+                                    message={errors.password}
+                                />
                             </div>
 
                             <div className="grid gap-2">
@@ -104,16 +115,22 @@ export default function Security(props: Props) {
                                     autoComplete="new-password"
                                     placeholder="Confirm password"
                                     passwordrules={props.passwordRules}
+                                    aria-invalid={Boolean(
+                                        errors.password_confirmation,
+                                    )}
+                                    aria-describedby="password_confirmation-error"
                                 />
 
                                 <InputError
+                                    id="password_confirmation-error"
                                     message={errors.password_confirmation}
                                 />
                             </div>
 
                             <div className="flex items-center gap-4">
                                 <Button
-                                    disabled={processing}
+                                    type="submit"
+                                    isDisabled={processing}
                                     data-test="update-password-button"
                                 >
                                     Save

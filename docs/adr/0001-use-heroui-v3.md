@@ -1,0 +1,3 @@
+# Use HeroUI v3 directly across the application
+
+The application will replace its shadcn/Radix UI with HeroUI v3 across all pages and layouts, while preserving content, navigation, authentication flows, responsive behavior, and light/dark/system preferences. The user chose HeroUI's default component appearance with the existing page structure, and direct HeroUI APIs rather than a compatibility layer that preserves shadcn APIs. After callers migrate, remove obsolete UI components and unused direct dependencies; retain application components that own behavior, and allow dependencies HeroUI itself needs transitively.

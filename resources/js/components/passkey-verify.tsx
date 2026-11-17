@@ -1,12 +1,10 @@
+import { Button, Separator, Spinner } from '@heroui/react';
 import type { UrlMethodPair } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { KeyRound } from 'lucide-react';
+import { dashboard } from '@/routes';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Spinner } from '@/components/ui/spinner';
-
 type Props = {
     routes?: {
         options: UrlMethodPair;
@@ -31,7 +29,7 @@ export default function PasskeyVerify({
             },
         }),
         onSuccess: (response) => {
-            router.visit(response.redirect ?? '/dashboard');
+            router.visit(response.redirect ?? dashboard.url());
         },
     });
 
@@ -47,7 +45,7 @@ export default function PasskeyVerify({
                     variant="outline"
                     className="w-full"
                     onClick={verify}
-                    disabled={isLoading}
+                    isDisabled={isLoading}
                 >
                     {isLoading ? <Spinner /> : <KeyRound className="h-4 w-4" />}
                     {isLoading
@@ -64,7 +62,7 @@ export default function PasskeyVerify({
                     <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
+                    <span className="bg-background px-2 text-muted">
                         {separator ?? 'Or continue with email'}
                     </span>
                 </div>

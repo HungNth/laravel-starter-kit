@@ -1,32 +1,27 @@
+import {
+    REGEXP_ONLY_DIGITS,
+    Label,
+    Input,
+    Button,
+    Modal,
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+    Spinner,
+} from '@heroui/react';
 import { Form } from '@inertiajs/react';
-import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from '@/components/ui/input-otp';
-import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
     return (
-        <div className="mb-3 rounded-full border border-border bg-card p-0.5 shadow-sm">
-            <div className="relative overflow-hidden rounded-full border border-border bg-muted p-2.5">
+        <div className="mb-3 rounded-full border border-border bg-surface p-0.5 shadow-sm">
+            <div className="relative overflow-hidden rounded-full border border-border bg-surface-secondary p-2.5">
                 <div className="absolute inset-0 grid grid-cols-5 opacity-50">
                     {Array.from({ length: 5 }, (_, i) => (
                         <div
@@ -62,7 +57,6 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
-    const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
@@ -81,12 +75,6 @@ function TwoFactorSetupStep({
                                         dangerouslySetInnerHTML={{
                                             __html: qrCodeSvg,
                                         }}
-                                        style={{
-                                            filter:
-                                                resolvedAppearance === 'dark'
-                                                    ? 'invert(1) brightness(1.5)'
-                                                    : undefined,
-                                        }}
                                     />
                                 ) : (
                                     <Spinner />
@@ -103,7 +91,7 @@ function TwoFactorSetupStep({
 
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
-                        <span className="relative bg-card px-2 py-1">
+                        <span className="relative bg-surface px-2 py-1">
                             or, enter the code manually
                         </span>
                     </div>
@@ -111,23 +99,29 @@ function TwoFactorSetupStep({
                     <div className="flex w-full space-x-2">
                         <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
                             {!manualSetupKey ? (
-                                <div className="flex h-full w-full items-center justify-center bg-muted p-3">
+                                <div className="flex h-full w-full items-center justify-center bg-surface-secondary p-3">
                                     <Spinner />
                                 </div>
                             ) : (
                                 <>
-                                    <input
+                                    <Input
                                         type="text"
+                                        aria-label="Manual setup key"
                                         readOnly
                                         value={manualSetupKey}
                                         className="h-full w-full bg-background p-3 text-foreground outline-none"
                                     />
-                                    <button
-                                        onClick={() => copy(manualSetupKey)}
-                                        className="border-l border-border px-3 hover:bg-muted"
+                                    <Button
+                                        aria-label="Copy setup key"
+                                        isIconOnly
+                                        variant="ghost"
+                                        onPress={() => {
+                                            void copy(manualSetupKey);
+                                        }}
+                                        className="border-l border-border px-3 hover:bg-surface-secondary"
                                     >
                                         <IconComponent className="w-4" />
-                                    </button>
+                                    </Button>
                                 </>
                             )}
                         </div>
@@ -158,6 +152,14 @@ function TwoFactorVerificationStep({
         <Form
             {...confirm.form()}
             onSuccess={() => onClose()}
+            onError={() => {
+                setCode('');
+                setTimeout(() => {
+                    pinInputContainerRef.current
+                        ?.querySelector('input')
+                        ?.focus();
+                }, 0);
+            }}
             resetOnError
             resetOnSuccess
         >
@@ -174,12 +176,21 @@ function TwoFactorVerificationStep({
                         className="relative w-full space-y-3"
                     >
                         <div className="flex w-full flex-col items-center space-y-3 py-2">
+                            <Label htmlFor="otp" className="sr-only">
+                                Authentication code
+                            </Label>
                             <InputOTP
+                                isInvalid={Boolean(
+                                    errors?.confirmTwoFactorAuthentication
+                                        ?.code,
+                                )}
+                                aria-describedby="confirm-code-error"
                                 id="otp"
                                 name="code"
                                 maxLength={OTP_MAX_LENGTH}
+                                value={code}
                                 onChange={setCode}
-                                disabled={processing}
+                                isDisabled={processing}
                                 pattern={REGEXP_ONLY_DIGITS}
                                 autoFocus
                             >
@@ -196,6 +207,7 @@ function TwoFactorVerificationStep({
                                 </InputOTPGroup>
                             </InputOTP>
                             <InputError
+                                id="confirm-code-error"
                                 message={
                                     errors?.confirmTwoFactorAuthentication?.code
                                 }
@@ -208,14 +220,14 @@ function TwoFactorVerificationStep({
                                 variant="outline"
                                 className="flex-1"
                                 onClick={onBack}
-                                disabled={processing}
+                                isDisabled={processing}
                             >
                                 Back
                             </Button>
                             <Button
                                 type="submit"
                                 className="flex-1"
-                                disabled={
+                                isDisabled={
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
@@ -323,33 +335,40 @@ export default function TwoFactorSetupModal({
     }, [isOpen, qrCodeSvg]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader className="flex items-center justify-center">
-                    <GridScanIcon />
-                    <DialogTitle>{modalConfig.title}</DialogTitle>
-                    <DialogDescription className="text-center">
-                        {modalConfig.description}
-                    </DialogDescription>
-                </DialogHeader>
+        <Modal isOpen={isOpen} onOpenChange={(open) => !open && handleClose()}>
+            <Modal.Backdrop>
+                <Modal.Container>
+                    <Modal.Dialog className="w-full max-w-md">
+                        <Modal.CloseTrigger />
+                        <Modal.Header className="flex items-center justify-center">
+                            <GridScanIcon />
+                            <Modal.Heading>{modalConfig.title}</Modal.Heading>
+                            <p slot="description" className="text-center">
+                                {modalConfig.description}
+                            </p>
+                        </Modal.Header>
 
-                <div className="flex flex-col items-center space-y-5">
-                    {showVerificationStep ? (
-                        <TwoFactorVerificationStep
-                            onClose={handleClose}
-                            onBack={() => setShowVerificationStep(false)}
-                        />
-                    ) : (
-                        <TwoFactorSetupStep
-                            qrCodeSvg={qrCodeSvg}
-                            manualSetupKey={manualSetupKey}
-                            buttonText={modalConfig.buttonText}
-                            onNextStep={handleModalNextStep}
-                            errors={errors}
-                        />
-                    )}
-                </div>
-            </DialogContent>
-        </Dialog>
+                        <div className="flex flex-col items-center space-y-5">
+                            {showVerificationStep ? (
+                                <TwoFactorVerificationStep
+                                    onClose={handleClose}
+                                    onBack={() =>
+                                        setShowVerificationStep(false)
+                                    }
+                                />
+                            ) : (
+                                <TwoFactorSetupStep
+                                    qrCodeSvg={qrCodeSvg}
+                                    manualSetupKey={manualSetupKey}
+                                    buttonText={modalConfig.buttonText}
+                                    onNextStep={handleModalNextStep}
+                                    errors={errors}
+                                />
+                            )}
+                        </div>
+                    </Modal.Dialog>
+                </Modal.Container>
+            </Modal.Backdrop>
+        </Modal>
     );
 }

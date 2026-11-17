@@ -1,49 +1,38 @@
-import type { ComponentPropsWithoutRef } from 'react';
-import {
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { toUrl } from '@/lib/utils';
+import { Link, Tooltip } from '@heroui/react';
+import { cn, toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
 export function NavFooter({
     items,
+    collapsed = false,
     className,
-    ...props
-}: ComponentPropsWithoutRef<typeof SidebarGroup> & {
+}: {
     items: NavItem[];
+    collapsed?: boolean;
+    className?: string;
 }) {
     return (
-        <SidebarGroup
-            {...props}
-            className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}
-        >
-            <SidebarGroupContent>
-                <SidebarMenu>
-                    {items.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton
-                                asChild
-                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
-                            >
-                                <a
-                                    href={toUrl(item.href)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {item.icon && (
-                                        <item.icon className="h-5 w-5" />
-                                    )}
-                                    <span>{item.title}</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
-        </SidebarGroup>
+        <nav aria-label="Resources" className={cn('grid gap-2', className)}>
+            {items.map((item) => (
+                <Tooltip key={item.title} isDisabled={!collapsed} delay={0}>
+                    <Link
+                        href={toUrl(item.href)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={collapsed ? item.title : undefined}
+                        className={cn(
+                            'flex gap-2 px-3 py-2 text-sm text-muted',
+                            collapsed && 'justify-center px-0',
+                        )}
+                    >
+                        {item.icon && <item.icon className="size-5 shrink-0" />}
+                        {!collapsed && item.title}
+                    </Link>
+                    <Tooltip.Content placement="right">
+                        {item.title}
+                    </Tooltip.Content>
+                </Tooltip>
+            ))}
+        </nav>
     );
 }

@@ -1,15 +1,15 @@
-import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import AlertError from '@/components/alert-error';
-import { Button } from '@/components/ui/button';
 import {
+    Button,
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
+} from '@heroui/react';
+import { Form } from '@inertiajs/react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import AlertError from '@/components/alert-error';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 
 type Props = {
@@ -37,7 +37,11 @@ export default function TwoFactorRecoveryCodes({
         if (!codesAreVisible) {
             setTimeout(() => {
                 codesSectionRef.current?.scrollIntoView({
-                    behavior: 'smooth',
+                    behavior: window.matchMedia(
+                        '(prefers-reduced-motion: reduce)',
+                    ).matches
+                        ? 'instant'
+                        : 'smooth',
                     block: 'nearest',
                 });
             });
@@ -89,7 +93,7 @@ export default function TwoFactorRecoveryCodes({
                                 <Button
                                     variant="secondary"
                                     type="submit"
-                                    disabled={processing}
+                                    isDisabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
                                     <RefreshCw /> Regenerate codes
@@ -100,7 +104,7 @@ export default function TwoFactorRecoveryCodes({
                 </div>
                 <div
                     id="recovery-codes-section"
-                    className={`relative overflow-hidden transition-all duration-300 ${codesAreVisible ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}
+                    className={`relative overflow-hidden transition-all duration-300 motion-reduce:transition-none ${codesAreVisible ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}
                     aria-hidden={!codesAreVisible}
                 >
                     <div className="mt-3 space-y-3">
@@ -110,7 +114,7 @@ export default function TwoFactorRecoveryCodes({
                             <>
                                 <div
                                     ref={codesSectionRef}
-                                    className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
+                                    className="grid gap-1 rounded-lg bg-surface-secondary p-4 font-mono text-sm"
                                     role="list"
                                     aria-label="Recovery codes"
                                 >
@@ -134,7 +138,7 @@ export default function TwoFactorRecoveryCodes({
                                                 (_, index) => (
                                                     <div
                                                         key={index}
-                                                        className="h-4 animate-pulse rounded bg-muted-foreground/20"
+                                                        className="h-4 animate-pulse rounded bg-surface-secondary/20 motion-reduce:animate-none"
                                                         aria-hidden="true"
                                                     />
                                                 ),
@@ -143,7 +147,7 @@ export default function TwoFactorRecoveryCodes({
                                     )}
                                 </div>
 
-                                <div className="text-xs text-muted-foreground select-none">
+                                <div className="text-xs text-muted select-none">
                                     <p id="regenerate-warning">
                                         Each recovery code can be used once to
                                         access your account and will be removed

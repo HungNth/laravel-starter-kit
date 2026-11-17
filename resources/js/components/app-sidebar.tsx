@@ -1,30 +1,17 @@
+import { Drawer } from '@heroui/react';
 import { Link } from '@inertiajs/react';
 import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import AppLogoIcon from '@/components/app-logo-icon';
+import { useAppSidebar } from '@/components/app-shell';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
+const mainItems = [{ title: 'Dashboard', href: dashboard(), icon: LayoutGrid }];
+const footerItems = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',
@@ -37,29 +24,76 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-export function AppSidebar() {
+function SidebarContent({
+    collapsed = false,
+    onNavigate,
+}: {
+    collapsed?: boolean;
+    onNavigate?: () => void;
+}) {
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
+        <>
+            <Link
+                href={dashboard()}
+                prefetch
+                onClick={onNavigate}
+                aria-label="Dashboard"
+                className="flex h-12 items-center gap-2 rounded-lg px-2 focus-visible:outline-2 focus-visible:outline-focus"
+            >
+                {collapsed ? (
+                    <AppLogoIcon className="size-8 fill-current" />
+                ) : (
+                    <AppLogo />
+                )}
+            </Link>
+            <NavMain
+                items={mainItems}
+                collapsed={collapsed}
+                onNavigate={onNavigate}
+            />
+            <div className="mt-auto grid gap-3">
+                <NavFooter items={footerItems} collapsed={collapsed} />
+                <NavUser collapsed={collapsed} onNavigate={onNavigate} />
+            </div>
+        </>
+    );
+}
 
-            <SidebarContent>
-                <NavMain items={mainNavItems} />
-            </SidebarContent>
-
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
-            </SidebarFooter>
-        </Sidebar>
+export function AppSidebar() {
+    const { expanded, mobileOpen, setMobileOpen } = useAppSidebar();
+    return (
+        <>
+            <aside
+                id="app-sidebar"
+                aria-label="Main navigation"
+                className={cn(
+                    'sticky top-0 hidden h-svh shrink-0 flex-col gap-4 bg-surface p-2 md:flex',
+                    expanded ? 'w-64' : 'w-16',
+                )}
+            >
+                <SidebarContent collapsed={!expanded} />
+            </aside>
+            <Drawer isOpen={mobileOpen} onOpenChange={setMobileOpen}>
+                <Drawer.Backdrop>
+                    <Drawer.Content placement="left">
+                        <Drawer.Dialog
+                            id="app-sidebar-mobile"
+                            aria-label="Main navigation"
+                            className="w-72 max-w-[calc(100vw-2rem)]"
+                        >
+                            <Drawer.CloseTrigger />
+                            <Drawer.Header>
+                                <Drawer.Heading>Navigation</Drawer.Heading>
+                            </Drawer.Header>
+                            <Drawer.Body className="flex flex-col gap-4">
+                                <SidebarContent
+                                    onNavigate={() => setMobileOpen(false)}
+                                />
+                            </Drawer.Body>
+                        </Drawer.Dialog>
+                    </Drawer.Content>
+                </Drawer.Backdrop>
+            </Drawer>
+        </>
     );
 }

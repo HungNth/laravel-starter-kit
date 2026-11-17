@@ -1,15 +1,6 @@
+import { Button, Modal } from '@heroui/react';
 import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import type { Passkey } from '@/types/auth';
 
 type Props = {
@@ -26,29 +17,27 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
     };
 
     return (
-        <div className="flex items-center justify-between border-b p-4 last:border-b-0">
-            <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                    <KeyRound className="h-5 w-5 text-muted-foreground" />
+        <div className="flex items-center justify-between gap-3 border-b border-border p-4 last:border-b-0">
+            <div className="flex min-w-0 items-center gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
+                    <KeyRound className="h-5 w-5 text-muted" />
                 </div>
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2.5">
-                        <p className="font-medium tracking-tight">
+                <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        <p className="font-medium tracking-tight wrap-anywhere">
                             {passkey.name}
                         </p>
                         {passkey.authenticator && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium tracking-wide text-muted-foreground uppercase ring-1 ring-border ring-inset">
+                            <span className="inline-flex items-center gap-1 rounded-md bg-surface-secondary px-2 py-0.5 text-[11px] font-medium tracking-wide text-muted uppercase ring-1 ring-border ring-inset">
                                 {passkey.authenticator}
                             </span>
                         )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted">
                         Added {passkey.created_at_diff}
                         {passkey.last_used_at_diff && (
                             <>
-                                <span className="mx-1 text-muted-foreground/50">
-                                    /
-                                </span>
+                                <span className="mx-1 text-muted/50">/</span>
                                 Last used {passkey.last_used_at_diff}
                             </>
                         )}
@@ -56,38 +45,46 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                 </div>
             </div>
 
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Remove</span>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogTitle>Remove passkey</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to remove the "{passkey.name}"
-                        passkey? You will no longer be able to use it to sign
-                        in.
-                    </DialogDescription>
-                    <DialogFooter className="gap-2">
-                        <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
-                        </DialogClose>
-                        <Button
-                            variant="destructive"
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                        >
-                            {isDeleting ? 'Removing...' : 'Remove passkey'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <Modal>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    isIconOnly
+                    className="shrink-0 text-danger hover:bg-danger/10 hover:text-danger"
+                >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Remove</span>
+                </Button>
+
+                <Modal.Backdrop>
+                    <Modal.Container>
+                        <Modal.Dialog>
+                            <Modal.CloseTrigger />
+                            <Modal.Heading>Remove passkey</Modal.Heading>
+                            <p slot="description">
+                                Are you sure you want to remove the "
+                                {passkey.name}" passkey? You will no longer be
+                                able to use it to sign in.
+                            </p>
+                            <Modal.Footer className="gap-2">
+                                <Button slot="close" variant="secondary">
+                                    Cancel
+                                </Button>
+
+                                <Button
+                                    variant="danger"
+                                    onClick={handleDelete}
+                                    isDisabled={isDeleting}
+                                >
+                                    {isDeleting
+                                        ? 'Removing...'
+                                        : 'Remove passkey'}
+                                </Button>
+                            </Modal.Footer>
+                        </Modal.Dialog>
+                    </Modal.Container>
+                </Modal.Backdrop>
+            </Modal>
         </div>
     );
 }

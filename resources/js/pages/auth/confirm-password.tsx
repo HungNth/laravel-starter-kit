@@ -1,9 +1,7 @@
+import { Button, Label, Spinner } from '@heroui/react';
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/password/confirm';
 import {
     index as confirmOptions,
@@ -37,15 +35,21 @@ export default function ConfirmPassword() {
                                 placeholder="Password"
                                 autoComplete="current-password"
                                 autoFocus
+                                aria-invalid={Boolean(errors.password)}
+                                aria-describedby="password-error"
                             />
 
-                            <InputError message={errors.password} />
+                            <InputError
+                                id="password-error"
+                                message={errors.password}
+                            />
                         </div>
 
                         <div className="flex items-center">
                             <Button
+                                type="submit"
                                 className="w-full"
-                                disabled={processing}
+                                isDisabled={processing}
                                 data-test="confirm-password-button"
                             >
                                 {processing && <Spinner />}

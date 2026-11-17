@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": ["artisan", "boost:mcp"]
+        },
+        "heroui-react": {
+            "command": "cmd",
+            "args": ["/d", "/c", "pnpm", "dlx", "@heroui/react-mcp@1.1.4"]
+        }
+    }
+}

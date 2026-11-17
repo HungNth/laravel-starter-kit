@@ -14,6 +14,7 @@ export default function PasswordInput({
     return (
         <div className="relative">
             <Input
+                fullWidth
                 type={showPassword ? 'text' : 'password'}
                 className={cn('pr-10', className)}
                 ref={ref}

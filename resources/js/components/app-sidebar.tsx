@@ -73,27 +73,25 @@ export function AppSidebar() {
             >
                 <SidebarContent collapsed={!expanded} />
             </aside>
-            <Drawer isOpen={mobileOpen} onOpenChange={setMobileOpen}>
-                <Drawer.Backdrop>
-                    <Drawer.Content placement="left">
-                        <Drawer.Dialog
-                            id="app-sidebar-mobile"
-                            aria-label="Main navigation"
-                            className="w-72 max-w-[calc(100vw-2rem)]"
-                        >
-                            <Drawer.CloseTrigger />
-                            <Drawer.Header>
-                                <Drawer.Heading>Navigation</Drawer.Heading>
-                            </Drawer.Header>
-                            <Drawer.Body className="flex flex-col gap-4">
-                                <SidebarContent
-                                    onNavigate={() => setMobileOpen(false)}
-                                />
-                            </Drawer.Body>
-                        </Drawer.Dialog>
-                    </Drawer.Content>
-                </Drawer.Backdrop>
-            </Drawer>
+            <Drawer.Backdrop isOpen={mobileOpen} onOpenChange={setMobileOpen}>
+                <Drawer.Content placement="left">
+                    <Drawer.Dialog
+                        id="app-sidebar-mobile"
+                        aria-label="Main navigation"
+                        className="w-72 max-w-[calc(100vw-2rem)]"
+                    >
+                        <Drawer.CloseTrigger />
+                        <Drawer.Header>
+                            <Drawer.Heading>Navigation</Drawer.Heading>
+                        </Drawer.Header>
+                        <Drawer.Body className="flex flex-col gap-4">
+                            <SidebarContent
+                                onNavigate={() => setMobileOpen(false)}
+                            />
+                        </Drawer.Body>
+                    </Drawer.Dialog>
+                </Drawer.Content>
+            </Drawer.Backdrop>
         </>
     );
 }

@@ -335,40 +335,39 @@ export default function TwoFactorSetupModal({
     }, [isOpen, qrCodeSvg]);
 
     return (
-        <Modal isOpen={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <Modal.Backdrop>
-                <Modal.Container>
-                    <Modal.Dialog className="w-full max-w-md">
-                        <Modal.CloseTrigger />
-                        <Modal.Header className="flex items-center justify-center">
-                            <GridScanIcon />
-                            <Modal.Heading>{modalConfig.title}</Modal.Heading>
-                            <p slot="description" className="text-center">
-                                {modalConfig.description}
-                            </p>
-                        </Modal.Header>
+        <Modal.Backdrop
+            isOpen={isOpen}
+            onOpenChange={(open) => !open && handleClose()}
+        >
+            <Modal.Container>
+                <Modal.Dialog className="w-full max-w-md">
+                    <Modal.CloseTrigger />
+                    <Modal.Header className="flex items-center justify-center">
+                        <GridScanIcon />
+                        <Modal.Heading>{modalConfig.title}</Modal.Heading>
+                        <p slot="description" className="text-center">
+                            {modalConfig.description}
+                        </p>
+                    </Modal.Header>
 
-                        <div className="flex flex-col items-center space-y-5">
-                            {showVerificationStep ? (
-                                <TwoFactorVerificationStep
-                                    onClose={handleClose}
-                                    onBack={() =>
-                                        setShowVerificationStep(false)
-                                    }
-                                />
-                            ) : (
-                                <TwoFactorSetupStep
-                                    qrCodeSvg={qrCodeSvg}
-                                    manualSetupKey={manualSetupKey}
-                                    buttonText={modalConfig.buttonText}
-                                    onNextStep={handleModalNextStep}
-                                    errors={errors}
-                                />
-                            )}
-                        </div>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <div className="flex flex-col items-center space-y-5">
+                        {showVerificationStep ? (
+                            <TwoFactorVerificationStep
+                                onClose={handleClose}
+                                onBack={() => setShowVerificationStep(false)}
+                            />
+                        ) : (
+                            <TwoFactorSetupStep
+                                qrCodeSvg={qrCodeSvg}
+                                manualSetupKey={manualSetupKey}
+                                buttonText={modalConfig.buttonText}
+                                onNextStep={handleModalNextStep}
+                                errors={errors}
+                            />
+                        )}
+                    </div>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

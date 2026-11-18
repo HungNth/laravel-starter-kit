@@ -9,6 +9,7 @@ const socket = new WebSocket(pages.find(page => page.type === 'page').webSocketD
 const pending = new Map();
 const exceptions = [];
 const consoleErrors = [];
+const pressResponderWarnings = [];
 let sequence = 0;
 let onLoad;
 socket.onmessage = event => {
@@ -22,6 +23,11 @@ socket.onmessage = event => {
         exceptions.push(message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text);
     } else if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error') {
         consoleErrors.push(message.params.args.map(argument => argument.value ?? argument.description).join(' '));
+    } else if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'warning') {
+        const warning = message.params.args[0]?.value;
+        if (typeof warning === 'string' && warning.startsWith('A PressResponder was rendered without a pressable child.')) {
+            pressResponderWarnings.push(warning);
+        }
     } else if (message.method === 'Page.loadEventFired') {
         onLoad?.();
     }
@@ -67,11 +73,11 @@ const navigate = async path => {
 };
 const hydrated = `Object.keys(document.querySelector('button') ?? document.querySelector('a') ?? {}).some(key => key.startsWith('__reactProps'))`;
 const check = name => console.log('PASS ' + name);
-const totp = secret => {
+const totp = (secret, timestamp = Date.now()) => {
     const bits = [...secret].map(character => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'.indexOf(character).toString(2).padStart(5, '0')).join('');
     const bytes = Buffer.from(bits.match(/.{8}/g).map(byte => parseInt(byte, 2)));
     const counter = Buffer.alloc(8);
-    counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+    counter.writeBigUInt64BE(BigInt(Math.floor(timestamp / 30000)));
     const hash = createHmac('sha1', bytes).update(counter).digest();
     return ((hash.readUInt32BE(hash[19] & 15) & 0x7fffffff) % 1000000).toString().padStart(6, '0');
 };
@@ -79,6 +85,7 @@ const totp = secret => {
 try {
     await send('Network.clearBrowserCookies');
     await send('Page.enable');
+    await send('Runtime.discardConsoleEntries');
     await send('Runtime.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await navigate('/register');
@@ -106,6 +113,8 @@ try {
     await waitFor('location.pathname === "/dashboard" && document.querySelector("#app-sidebar")');
     await waitFor(hydrated);
     await pause(300);
+    assert.equal(await evaluate('JSON.parse(document.querySelector("script[data-page]").textContent).component'), 'dashboard');
+    assert.deepEqual(pressResponderWarnings, [], 'No PressResponder warnings when opening the dashboard');
     check('email verification and dashboard rendering');
 
     await click('[aria-label="Toggle sidebar"]');
@@ -186,7 +195,8 @@ try {
     await button('Continue setup');
     await button('Continue');
     await waitFor('document.querySelector("input[name=code]")');
-    await fill('code', totp(secret));
+    const confirmedAt = Date.now();
+    await fill('code', totp(secret, confirmedAt));
     await button('Confirm');
     await waitFor('!document.querySelector("[role=dialog]") && document.body.textContent.includes("Disable 2FA")');
 
@@ -211,6 +221,10 @@ try {
     await button('Continue');
     await waitFor('document.querySelector("#recovery_code-error")?.textContent');
     await button('login using an authentication code');
+    const nextCodeAt = (Math.floor(confirmedAt / 30000) + 1) * 30000;
+    if (Date.now() < nextCodeAt) {
+        await pause(nextCodeAt - Date.now() + 100);
+    }
     await fill('code', totp(secret));
     await button('Continue');
     await waitFor('location.pathname === "/dashboard"');
@@ -279,6 +293,7 @@ try {
     check('virtual passkey registration, delete cancellation, and confirmed deletion');
     assert.deepEqual(exceptions, [], 'No browser runtime exceptions');
     assert.deepEqual(consoleErrors, [], 'No browser console errors');
+    assert.deepEqual(pressResponderWarnings, [], 'No PressResponder warnings during navigation and authentication');
     check('no browser runtime exceptions');
 } finally {
     socket.close();

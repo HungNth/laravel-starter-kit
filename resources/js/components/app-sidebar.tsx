@@ -1,25 +1,25 @@
-import { Drawer } from '@heroui/react';
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
-import AppLogo from '@/components/app-logo';
-import AppLogoIcon from '@/components/app-logo-icon';
-import { useAppSidebar } from '@/components/app-shell';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { cn } from '@/lib/utils';
-import { dashboard } from '@/routes';
+import { Drawer } from "@heroui/react";
+import { Link } from "@inertiajs/react";
+import { BookOpen, FolderGit2, LayoutGrid } from "lucide-react";
+import AppLogo from "@/components/app-logo";
+import AppLogoIcon from "@/components/app-logo-icon";
+import { useAppSidebar } from "@/components/app-shell";
+import { NavFooter } from "@/components/nav-footer";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { cn } from "@/lib/utils";
+import { dashboard } from "@/routes";
 
-const mainItems = [{ title: 'Dashboard', href: dashboard(), icon: LayoutGrid }];
+const mainItems = [{ title: "Dashboard", href: dashboard(), icon: LayoutGrid }];
 const footerItems = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: "Repository",
+        href: "https://github.com/HungNth/laravel-starter-kit",
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: "Documentation",
+        href: "https://github.com/HungNth/laravel-starter-kit#readme",
         icon: BookOpen,
     },
 ];
@@ -67,8 +67,8 @@ export function AppSidebar() {
                 id="app-sidebar"
                 aria-label="Main navigation"
                 className={cn(
-                    'sticky top-0 hidden h-svh shrink-0 flex-col gap-4 bg-surface p-2 md:flex',
-                    expanded ? 'w-64' : 'w-16',
+                    "sticky top-0 hidden h-svh shrink-0 flex-col gap-4 bg-surface p-2 md:flex",
+                    expanded ? "w-64" : "w-16",
                 )}
             >
                 <SidebarContent collapsed={!expanded} />

@@ -1,26 +1,26 @@
-import { Button, Drawer, buttonVariants } from '@heroui/react';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu } from 'lucide-react';
-import { useState } from 'react';
-import AppLogo from '@/components/app-logo';
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { useCurrentUrl } from '@/hooks/use-current-url';
-import { dashboard } from '@/routes';
-import type { BreadcrumbItem } from '@/types';
+import { Button, Drawer, buttonVariants } from "@heroui/react";
+import { Link } from "@inertiajs/react";
+import { BookOpen, Folder, LayoutGrid, Menu } from "lucide-react";
+import { useState } from "react";
+import AppLogo from "@/components/app-logo";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { NavFooter } from "@/components/nav-footer";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { useCurrentUrl } from "@/hooks/use-current-url";
+import { dashboard } from "@/routes";
+import type { BreadcrumbItem } from "@/types";
 
-const mainItems = [{ title: 'Dashboard', href: dashboard(), icon: LayoutGrid }];
+const mainItems = [{ title: "Dashboard", href: dashboard(), icon: LayoutGrid }];
 const footerItems = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: "Repository",
+        href: "https://github.com/HungNth/laravel-starter-kit",
         icon: Folder,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: "Documentation",
+        href: "https://github.com/HungNth/laravel-starter-kit#readme",
         icon: BookOpen,
     },
 ];
@@ -81,12 +81,12 @@ export function AppHeader({
                                 key={item.title}
                                 href={item.href}
                                 aria-current={
-                                    isCurrentUrl(item.href) ? 'page' : undefined
+                                    isCurrentUrl(item.href) ? "page" : undefined
                                 }
                                 className={buttonVariants({
                                     variant: isCurrentUrl(item.href)
-                                        ? 'secondary'
-                                        : 'ghost',
+                                        ? "secondary"
+                                        : "ghost",
                                 })}
                             >
                                 {item.title}

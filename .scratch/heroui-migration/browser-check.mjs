@@ -173,6 +173,7 @@ try {
     await waitFor('location.pathname === "/dashboard" && !document.querySelector("[role=dialog]")');
     check('mobile drawer and closing after navigation');
 
+    await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
     await navigate('/settings/security');
     await waitFor('location.pathname === "/user/confirm-password" || location.pathname === "/confirm-password"');
     await fill('password', password);
@@ -180,9 +181,35 @@ try {
     await waitFor('location.pathname === "/settings/security"');
     await button('Enable 2FA');
     await waitFor('document.querySelector("[role=dialog] input[readonly]")');
+    const setupKeyLayout = await evaluate(`(() => {
+        const field = document.querySelector('input[aria-label="Manual setup key"]');
+        const copyButton = document.querySelector('button[aria-label="Copy setup key"]');
+        field.focus();
+        const inputRect = field.getBoundingClientRect();
+        const buttonRect = copyButton.getBoundingClientRect();
+        return {
+            innerRadius: getComputedStyle(field).borderTopRightRadius,
+            buttonCentered: Math.abs(inputRect.y + inputRect.height / 2 - buttonRect.y - buttonRect.height / 2) < 2,
+        };
+    })()`);
+    assert.deepEqual(setupKeyLayout, { innerRadius: '0px', buttonCentered: true }, 'The setup key and copy button form one aligned field when focused');
+    const fieldFills = (slot) => evaluate(`(() => {
+        const dialog = document.querySelector('[role=dialog]');
+        const background = getComputedStyle(dialog).backgroundColor;
+        return [...dialog.querySelectorAll('[data-slot="${slot}"]')].map(field => {
+            const fill = getComputedStyle(field).backgroundColor;
+            return fill !== background && fill !== 'rgba(0, 0, 0, 0)';
+        });
+    })()`);
+    await evaluate('document.querySelector(\'button[aria-label="Copy setup key"]\').focus()');
+    await pause(200);
+    assert.deepEqual(await fieldFills('input-group'), [true], 'The manual setup key has a distinct idle fill in dark mode');
     const secret = await evaluate('document.querySelector("[role=dialog] input[readonly]").value');
     await button('Continue');
     await waitFor('document.querySelector("input[name=code]")');
+    await pause(200);
+    assert.deepEqual(await fieldFills('input-otp-slot'), Array(6).fill(true), 'All six OTP slots have a distinct fill in dark mode');
+    await send('Emulation.setEmulatedMedia', { features: [] });
     await fill('code', '123');
     assert.equal(await evaluate('[...document.querySelectorAll("button")].find(node => node.textContent.trim() === "Confirm").disabled'), true);
     await fill('code', '000000');

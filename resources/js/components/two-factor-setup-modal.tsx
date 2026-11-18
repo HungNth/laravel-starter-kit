@@ -1,22 +1,22 @@
 import {
     REGEXP_ONLY_DIGITS,
     Label,
-    Input,
+    InputGroup,
     Button,
     Modal,
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
     Spinner,
-} from '@heroui/react';
-import { Form } from '@inertiajs/react';
-import { Check, Copy, ScanLine } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AlertError from '@/components/alert-error';
-import InputError from '@/components/input-error';
-import { useClipboard } from '@/hooks/use-clipboard';
-import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/routes/two-factor';
+} from "@heroui/react";
+import { Form } from "@inertiajs/react";
+import { Check, Copy, ScanLine } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AlertError from "@/components/alert-error";
+import InputError from "@/components/input-error";
+import { useClipboard } from "@/hooks/use-clipboard";
+import { OTP_MAX_LENGTH } from "@/hooks/use-two-factor-auth";
+import { confirm } from "@/routes/two-factor";
 
 function GridScanIcon() {
     return (
@@ -96,36 +96,34 @@ function TwoFactorSetupStep({
                         </span>
                     </div>
 
-                    <div className="flex w-full space-x-2">
-                        <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
-                            {!manualSetupKey ? (
-                                <div className="flex h-full w-full items-center justify-center bg-surface-secondary p-3">
-                                    <Spinner />
-                                </div>
-                            ) : (
-                                <>
-                                    <Input
-                                        type="text"
-                                        aria-label="Manual setup key"
-                                        readOnly
-                                        value={manualSetupKey}
-                                        className="h-full w-full bg-background p-3 text-foreground outline-none"
-                                    />
+                    <InputGroup fullWidth variant="secondary">
+                        {manualSetupKey ? (
+                            <>
+                                <InputGroup.Input
+                                    aria-label="Manual setup key"
+                                    className="min-w-0"
+                                    readOnly
+                                    value={manualSetupKey}
+                                />
+                                <InputGroup.Suffix className="px-1">
                                     <Button
+                                        type="button"
                                         aria-label="Copy setup key"
                                         isIconOnly
+                                        size="sm"
                                         variant="ghost"
                                         onPress={() => {
                                             void copy(manualSetupKey);
                                         }}
-                                        className="border-l border-border px-3 hover:bg-surface-secondary"
                                     >
-                                        <IconComponent className="w-4" />
+                                        <IconComponent className="size-4" />
                                     </Button>
-                                </>
-                            )}
-                        </div>
-                    </div>
+                                </InputGroup.Suffix>
+                            </>
+                        ) : (
+                            <Spinner className="mx-auto" />
+                        )}
+                    </InputGroup>
                 </>
             )}
         </>
@@ -139,12 +137,12 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
-    const [code, setCode] = useState<string>('');
+    const [code, setCode] = useState<string>("");
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTimeout(() => {
-            pinInputContainerRef.current?.querySelector('input')?.focus();
+            pinInputContainerRef.current?.querySelector("input")?.focus();
         }, 0);
     }, []);
 
@@ -153,10 +151,10 @@ function TwoFactorVerificationStep({
             {...confirm.form()}
             onSuccess={() => onClose()}
             onError={() => {
-                setCode('');
+                setCode("");
                 setTimeout(() => {
                     pinInputContainerRef.current
-                        ?.querySelector('input')
+                        ?.querySelector("input")
                         ?.focus();
                 }, 0);
             }}
@@ -180,6 +178,7 @@ function TwoFactorVerificationStep({
                                 Authentication code
                             </Label>
                             <InputOTP
+                                variant="secondary"
                                 isInvalid={Boolean(
                                     errors?.confirmTwoFactorAuthentication
                                         ?.code,
@@ -274,27 +273,27 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-factor authentication enabled',
+                title: "Two-factor authentication enabled",
                 description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                    "Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.",
+                buttonText: "Close",
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify authentication code',
+                title: "Verify authentication code",
                 description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                    "Enter the 6-digit code from your authenticator app",
+                buttonText: "Continue",
             };
         }
 
         return {
-            title: 'Enable two-factor authentication',
+            title: "Enable two-factor authentication",
             description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+                "To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app",
+            buttonText: "Continue",
         };
     }, [twoFactorEnabled, showVerificationStep]);
 

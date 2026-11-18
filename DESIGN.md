@@ -47,6 +47,8 @@ Each form has a clear main action. Destructive actions remain separated from rou
 
 Fields retain visible labels, autocomplete, password visibility controls, and adjacent validation messages. Page-level failures receive persistent feedback; transient success feedback uses the shared toast presentation. Existing error wording and server validation remain authoritative.
 
+Inputs and OTP slots inside dialogs and drawers must be visually distinct from the surrounding surface before they receive focus, in both light and dark mode. Prefer HeroUI’s `secondary` variant when the default fill blends into the surface. Keep focus and validation states visible.
+
 Authentication dialogs retain their titles, initial focus, keyboard dismissal where permitted, focus return, and cleanup on close. OTP and recovery-code entry remain distinct modes. QR codes and recovery codes stay legible in both themes.
 
 ## Accessibility and motion

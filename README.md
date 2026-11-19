@@ -13,7 +13,7 @@ Each branch contains a starter kit. The `react/heroui` branch includes registrat
 
 ## Private homelab deployment
 
-You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docker network, and a NetBird DNS record pointing your internal hostname to the proxy.
+You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docker network, and a NetBird DNS record pointing your internal hostname to the proxy. If you already run MariaDB 11, clone the branch and enter the checkout in step 1, then continue at step 3.
 
 1. Clone the deployment branch and start the shared PostgreSQL 18 project once per host.
 
@@ -50,6 +50,8 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docke
     ```
 
     Set `APP_URL` to the app's internal HTTP URL and `DB_PASSWORD` to the app login's password. Fill in the SMTP settings. Single-quote values containing literal dollar signs. Leave `APP_KEY` blank to generate and save a key in the `app-data` volume, or provide your own key.
+
+    For MariaDB 11, create an empty database and grant a dedicated login privileges on that database. In `.env`, set `DB_CONNECTION=mariadb` and set `DB_NETWORK` to an existing Docker network the app can use to reach the server. Set `DB_HOST` to the server address on that network and `DB_PORT` to its port (usually `3306`). Set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` to the database and login you created.
 
     ```bash
     docker compose up -d --build --wait

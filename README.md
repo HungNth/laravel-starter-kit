@@ -11,6 +11,90 @@ Each branch contains a starter kit. The `react/heroui` branch includes registrat
 - The backend uses PHP 8.4, Laravel 13, and Fortify.
 - The frontend uses React 19, Inertia 3, TypeScript, HeroUI 3, and Tailwind CSS 4.
 
+## Private homelab deployment
+
+You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docker network, and a NetBird DNS record pointing your internal hostname to the proxy. If you already run MariaDB 11, clone the branch and enter the checkout in step 1, then continue at step 3.
+
+1. Clone the deployment branch and start the shared PostgreSQL 18 project once per host.
+
+    ```bash
+    git clone --branch deploy/homelab --single-branch https://github.com/HungNth/laravel-starter-kit.git
+    cd laravel-starter-kit
+    cp -n .env.postgresql.example .env.postgresql
+    chmod 600 .env.postgresql
+    ```
+
+    Set a strong `POSTGRES_PASSWORD` in `.env.postgresql` before starting PostgreSQL.
+
+    ```bash
+    docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml up -d --wait
+    docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml exec postgres psql -U postgres
+    ```
+
+2. At the `psql` prompt, create an empty database and a login that owns it. Set its password when prompted by `\password`.
+
+    ```sql
+    REVOKE CONNECT ON DATABASE postgres, template1 FROM PUBLIC;
+    CREATE ROLE laravel LOGIN;
+    \password laravel
+    CREATE DATABASE laravel OWNER laravel;
+    REVOKE CONNECT ON DATABASE laravel FROM PUBLIC;
+    \q
+    ```
+
+    To add another app on the same host, use a separate checkout with its own `.env`. Repeat the role and database commands with a new name, such as `notes`, and a different password. Revoke `CONNECT` from `PUBLIC` on each new database so the other app logins cannot connect.
+
+    In the new `.env`, set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` to the new database name, login, and password. Keep `DB_NETWORK`, `DB_HOST`, and `DB_PORT` pointed at the shared PostgreSQL service. Choose a unique `COMPOSE_PROJECT_NAME` and `APP_PROXY_ALIAS`, such as `notes-homelab`, and set `APP_URL` to its own internal HTTP URL. Compose uses the project name to give the app its own `app-data` volume. Add a NetBird DNS record and a Proxy Host for the new hostname.
+
+3. Create the app's `.env` from the deployment example.
+
+    ```bash
+    cp -n .env.homelab.example .env
+    chmod 600 .env
+    ```
+
+    Set `APP_URL` to the app's internal HTTP URL and `DB_PASSWORD` to the app login's password. Fill in the SMTP settings. Single-quote values containing literal dollar signs. Leave `APP_KEY` blank to generate and save a key in the `app-data` volume, or provide your own key.
+
+    For MariaDB 11, create an empty database and grant a dedicated login privileges on that database. In `.env`, set `DB_CONNECTION=mariadb` and set `DB_NETWORK` to an existing Docker network the app can use to reach the server. Set `DB_HOST` to the server address on that network and `DB_PORT` to its port (usually `3306`). Set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` to the database and login you created.
+
+    ```bash
+    docker compose up -d --build --wait
+    ```
+
+4. In Nginx Proxy Manager, add a Proxy Host for the hostname in `APP_URL`. Set the scheme to `http`, the forward hostname to the value of `APP_PROXY_ALIAS`, and the forward port to `8080`. From a NetBird-connected device, check that `/up` returns HTTP 200 and `/login` loads with its styles.
+
+### Back up and update
+
+1. Back up the app before pulling changes. Stop the app first so the database and files reflect the same point in time. This example uses the PostgreSQL project and database names above. For MariaDB, use `mariadb-dump` for the database backup.
+
+    ```bash
+    (
+        umask 077
+        backup_dir=$(mktemp -d "$HOME/laravel-backup.XXXXXXXX") &&
+            docker compose stop app &&
+            docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml exec -T postgres pg_dump -U postgres -Fc laravel > "$backup_dir/database.dump" &&
+            docker compose run --rm -T --no-deps --entrypoint tar app -czf - -C /var/www/html/storage/app . > "$backup_dir/app-data.tar.gz" &&
+            cp .env "$backup_dir/.env" &&
+            printf 'Backup saved to %s\n' "$backup_dir"
+    )
+    ```
+
+    Keep the backup private. The generated key is in `app-data.tar.gz`. A supplied key is in the backed-up `.env`. If the backup fails, run `docker compose start app` to bring the current release back before retrying.
+
+2. Keep the same `COMPOSE_PROJECT_NAME` and `APP_KEY` setting in `.env`, then pull and deploy.
+
+    ```bash
+    git pull --ff-only && docker compose up -d --build --wait
+    ```
+
+3. Check that `/up` returns HTTP 200 and `/login` loads through the proxy. Use these commands to check status, read startup errors, and list migrations once the app is healthy.
+
+    ```bash
+    docker compose ps --all
+    docker compose logs --tail=100 app
+    docker compose exec -T app php artisan migrate:status --no-interaction
+    ```
+
 ## Local development
 
 You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.0.
@@ -39,56 +123,6 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
     ```
 
     Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
-
-## Private homelab deployment
-
-You'll need Docker Engine with Compose, Nginx Proxy Manager on the Docker network `proxy`, and a NetBird DNS record that points your internal hostname to the proxy. Keep the proxy accessible only to your private network.
-
-1. Clone the deployment branch and create your runtime configuration.
-
-    ```bash
-    git clone --branch deploy/homelab --single-branch https://github.com/HungNth/laravel-starter-kit.git
-    cd laravel-starter-kit
-    cp -n .env.homelab.example .env.homelab
-    chmod 600 .env.homelab
-    docker run --rm php:8.4.27-cli-trixie php -r 'echo "base64:", base64_encode(random_bytes(32)), PHP_EOL;'
-    ```
-
-    In `.env.homelab`, set `APP_URL` to your internal HTTP URL, such as `http://laravel.example.internal`. Set `APP_KEY` to the generated value and keep it when recreating or upgrading containers. Set a strong `DB_PASSWORD`. The database and app user both default to `laravel`. Set `DB_DATABASE` and `DB_USERNAME` to customize them. For MariaDB, set a separate strong `MARIADB_ROOT_PASSWORD` for local database administration. Fill in the SMTP host, port, sender, and any credentials your SMTP server requires. Use `MAIL_SCHEME=smtps` if your server uses implicit TLS. Single-quote passwords with literal dollar signs.
-
-2. Choose one database for the deployment. The command below uses PostgreSQL 18. For MariaDB 11.8, replace `docker-compose.postgresql.yaml` with `docker-compose.mariadb.yaml`. Both options use the same proxy hostname. Build the app image and run the migrations before starting the app.
-
-    ```bash
-    compose() {
-        docker compose --project-name laravel-homelab --env-file .env.homelab \
-            --file docker-compose.postgresql.yaml "$@"
-    }
-
-    compose build app &&
-    compose up --detach --wait db &&
-    compose run --rm --user www-data app php artisan migrate --force --no-interaction &&
-    compose up --detach --wait
-    ```
-
-    Compose keeps Laravel files and database data in named volumes. Keep the same Compose file, project name, and volumes when recreating containers.
-
-3. Add a Proxy Host in Nginx Proxy Manager using the hostname from `APP_URL`. Set **Scheme** to `http`, **Forward Hostname / IP** to `laravel-homelab`, and **Forward Port** to `80`. From a NetBird-connected device, open `/up` on your internal host and confirm it returns HTTP 200. Open `/login` to check that the page loads with styling, then exercise registration, 2FA, and password reset. The verification and reset emails should link back to your internal HTTP URL.
-
-### Homelab upgrades
-
-Back up the named volumes and your runtime configuration before upgrading. From the deployment checkout, define `compose()` as shown in step 2 with the Compose file you used to install. Then run the commands below.
-
-```bash
-git pull --ff-only &&
-compose pull db &&
-compose build --pull app &&
-compose stop app &&
-compose up --detach --wait db &&
-compose run --rm --user www-data app php artisan migrate --force --no-interaction &&
-compose up --detach --wait
-```
-
-The app starts after the migration succeeds. Recheck `/up` and sign in before resuming traffic. Ordinary starts and restarts leave migrations for the operator to run.
 
 ## Tooling
 

@@ -1,5 +1,14 @@
 <?php
 
+use Illuminate\Support\Env;
+
+$appKey = Env::getRepository()->get('APP_KEY');
+$appKeyFile = env('APP_KEY_FILE');
+
+if (($appKey === null || $appKey === '') && is_string($appKeyFile) && is_readable($appKeyFile)) {
+    $appKey = trim((string) file_get_contents($appKeyFile));
+}
+
 return [
 
     /*
@@ -97,7 +106,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key' => $appKey,
 
     'previous_keys' => [
         ...array_filter(

@@ -1,0 +1,44 @@
+services:
+    app:
+        build: .
+        restart: unless-stopped
+        environment:
+            APP_ENV: production
+            APP_DEBUG: 'false'
+            APP_URL: ${APP_URL:?Set APP_URL to the internal HTTP URL}
+            APP_KEY: ${APP_KEY:-}
+            LOG_CHANNEL: stderr
+            SESSION_SECURE_COOKIE: 'false'
+            DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+            DB_HOST: ${DB_HOST:-postgres}
+            DB_PORT: ${DB_PORT:-5432}
+            DB_DATABASE: ${DB_DATABASE:?Set DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+            MAIL_MAILER: smtp
+            MAIL_SCHEME: ${MAIL_SCHEME:-smtp}
+            MAIL_HOST: ${MAIL_HOST:?Set MAIL_HOST}
+            MAIL_PORT: ${MAIL_PORT:-587}
+            MAIL_USERNAME: ${MAIL_USERNAME:-}
+            MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+            MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:?Set MAIL_FROM_ADDRESS}
+            MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Laravel}
+        volumes:
+            - app-data:/var/www/html/storage/app
+        healthcheck:
+            start_period: 5m
+        networks:
+            database:
+            proxy:
+                aliases:
+                    - ${APP_PROXY_ALIAS:-laravel-homelab}
+
+networks:
+    database:
+        external: true
+        name: ${DB_NETWORK:-homelab-postgres}
+    proxy:
+        external: true
+
+volumes:
+    app-data:

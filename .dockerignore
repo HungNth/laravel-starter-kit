@@ -6,13 +6,13 @@
 !composer.json
 !composer.lock
 !config/**
+!docker/entrypoint.d/*.sh
 !database/factories/**
 !database/migrations/**
 !database/seeders/**
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
-!public/.htaccess
 !public/apple-touch-icon.png
 !public/favicon.ico
 !public/favicon.svg

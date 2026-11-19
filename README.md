@@ -24,7 +24,7 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docke
     chmod 600 .env.postgresql
     ```
 
-    Set a strong `POSTGRES_PASSWORD` in `.env.postgresql`, then run:
+    Set a strong `POSTGRES_PASSWORD` in `.env.postgresql` before starting PostgreSQL.
 
     ```bash
     docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml up -d --wait
@@ -63,36 +63,7 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docke
 
 4. In Nginx Proxy Manager, add a Proxy Host for the hostname in `APP_URL`. Set the scheme to `http`, the forward hostname to the value of `APP_PROXY_ALIAS`, and the forward port to `8080`. From a NetBird-connected device, check that `/up` returns HTTP 200 and `/login` loads with its styles.
 
-## Local development
-
-You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.0.
-
-1. Clone the `react/heroui` branch from GitHub.
-
-    ```bash
-    git clone --branch react/heroui --single-branch https://github.com/HungNth/laravel-starter-kit.git
-    cd laravel-starter-kit
-    ```
-
-2. Install dependencies and create your `.env` file.
-
-    ```bash
-    composer install
-    php -r "file_exists('.env') || copy('.env.example', '.env');"
-    php artisan key:generate --no-interaction
-    pnpm install --frozen-lockfile
-    ```
-
-3. Set your database connection in `.env`, then run the migrations and start the app.
-
-    ```bash
-    php artisan migrate --no-interaction
-    composer run dev
-    ```
-
-    Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
-
-## Homelab backups and updates
+### Back up and update
 
 1. Back up the app before pulling changes. Stop the app first so the database and files reflect the same point in time. This example uses the PostgreSQL project and database names above. For MariaDB, use `mariadb-dump` for the database backup.
 
@@ -123,6 +94,35 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
     docker compose logs --tail=100 app
     docker compose exec -T app php artisan migrate:status --no-interaction
     ```
+
+## Local development
+
+You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.0.
+
+1. Clone the `react/heroui` branch from GitHub.
+
+    ```bash
+    git clone --branch react/heroui --single-branch https://github.com/HungNth/laravel-starter-kit.git
+    cd laravel-starter-kit
+    ```
+
+2. Install dependencies and create your `.env` file.
+
+    ```bash
+    composer install
+    php -r "file_exists('.env') || copy('.env.example', '.env');"
+    php artisan key:generate --no-interaction
+    pnpm install --frozen-lockfile
+    ```
+
+3. Set your database connection in `.env`, then run the migrations and start the app.
+
+    ```bash
+    php artisan migrate --no-interaction
+    composer run dev
+    ```
+
+    Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
 
 ## Tooling
 

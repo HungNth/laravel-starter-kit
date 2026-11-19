@@ -1,0 +1,23 @@
+services:
+    postgres:
+        image: postgres:18
+        restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+        volumes:
+            - postgresql-data:/var/lib/postgresql
+        networks:
+            - database
+        healthcheck:
+            test: [CMD, pg_isready, -h, 127.0.0.1, -U, postgres]
+            interval: 5s
+            timeout: 5s
+            retries: 12
+
+networks:
+    database:
+        internal: true
+        name: ${DB_NETWORK:-homelab-postgres}
+
+volumes:
+    postgresql-data:

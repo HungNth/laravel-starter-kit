@@ -1,21 +1,8 @@
-FROM composer:2 AS composer
 FROM node:24-trixie-slim AS node
 FROM ghcr.io/pnpm/pnpm:12.21.0 AS pnpm
+FROM serversideup/php:8.4.27-fpm-nginx AS php
 
-FROM php:8.4.27-apache-trixie AS php
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libpq5 \
-    && docker-php-ext-install -j"$(nproc)" opcache pdo_mysql pdo_pgsql \
-    && apt-get purge -y --auto-remove libpq-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && a2enmod rewrite \
-    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf \
-    && printf '<Directory /var/www/html/public>\n    AllowOverride All\n</Directory>\n' > /etc/apache2/conf-available/laravel.conf \
-    && a2enconf laravel
-
-WORKDIR /var/www/html
+USER root
 
 RUN mkdir -p bootstrap/cache storage/app/private storage/app/public \
         storage/framework/cache/data storage/framework/cache/locks \
@@ -24,13 +11,8 @@ RUN mkdir -p bootstrap/cache storage/app/private storage/app/public \
 
 FROM php AS build
 
-COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=pnpm /opt/pnpm/pnpm /usr/local/bin/pnpm
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends unzip \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --ignore-scripts
@@ -49,6 +31,10 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 
 FROM php
 
+ENV APP_KEY_FILE=/var/www/html/storage/app/.app-key \
+    HEALTHCHECK_PATH=/up \
+    PHP_OPCACHE_ENABLE=1
+
 COPY --from=build /var/www/html/artisan /var/www/html/composer.json ./
 COPY --from=build /var/www/html/app/ app/
 COPY --from=build /var/www/html/bootstrap/app.php /var/www/html/bootstrap/providers.php bootstrap/
@@ -58,3 +44,6 @@ COPY --from=build /var/www/html/public/ public/
 COPY --from=build /var/www/html/resources/views/ resources/views/
 COPY --from=build /var/www/html/routes/ routes/
 COPY --from=build /var/www/html/vendor/ vendor/
+COPY docker/entrypoint.d/20-prepare-laravel.sh /etc/entrypoint.d/
+
+USER www-data

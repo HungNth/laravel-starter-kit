@@ -86,6 +86,36 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
 
     Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
 
+## Homelab backups and updates
+
+1. Back up the app before pulling changes. Stop the app first so the database and files reflect the same point in time. This example uses the PostgreSQL project and database names above. For MariaDB, use `mariadb-dump` for the database backup.
+
+    ```bash
+    umask 077
+    backup_dir=$(mktemp -d "$HOME/laravel-backup.XXXXXXXX") &&
+        docker compose stop app &&
+        docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml exec -T postgres pg_dump -U postgres -Fc laravel > "$backup_dir/database.dump" &&
+        docker compose run --rm -T --no-deps --entrypoint tar app -czf - -C /var/www/html/storage/app . > "$backup_dir/app-data.tar.gz" &&
+        cp .env "$backup_dir/.env" &&
+        printf 'Backup saved to %s\n' "$backup_dir"
+    ```
+
+    Keep the backup private. The generated key is in `app-data.tar.gz`. A supplied key is in the backed-up `.env`. If the backup fails, run `docker compose start app` to bring the current release back before retrying.
+
+2. Keep the same `COMPOSE_PROJECT_NAME` and `APP_KEY` setting in `.env`, then pull and deploy.
+
+    ```bash
+    git pull --ff-only && docker compose up -d --build --wait
+    ```
+
+3. Check that `/up` returns HTTP 200 and `/login` loads through the proxy. Use these commands to check status, read startup errors, and list migrations once the app is healthy.
+
+    ```bash
+    docker compose ps --all
+    docker compose logs --tail=100 app
+    docker compose exec -T app php artisan migrate:status --no-interaction
+    ```
+
 ## Tooling
 
 - pnpm installs frontend dependencies. [Vite+](https://viteplus.dev/guide/check) runs the dev server, builds assets, formats code, and runs the linter.

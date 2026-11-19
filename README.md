@@ -54,9 +54,9 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the Docker networ
     docker run --rm php:8.4.27-cli-trixie php -r 'echo "base64:", base64_encode(random_bytes(32)), PHP_EOL;'
     ```
 
-    In `.env.homelab`, set `APP_URL` to your internal HTTP URL, such as `http://laravel.example.internal`. Set `APP_KEY` to the generated value and keep it when recreating or upgrading containers. Set a strong `DB_PASSWORD` and fill in the SMTP host, port, sender, and any credentials your SMTP server requires. Use `MAIL_SCHEME=smtps` if your server uses implicit TLS. Single-quote passwords with literal dollar signs.
+    In `.env.homelab`, set `APP_URL` to your internal HTTP URL, such as `http://laravel.example.internal`. Set `APP_KEY` to the generated value and keep it when recreating or upgrading containers. Set a strong `DB_PASSWORD`. The database and app user both default to `laravel`. Set `DB_DATABASE` and `DB_USERNAME` to customize them. For MariaDB, set a separate strong `MARIADB_ROOT_PASSWORD` for local database administration. Fill in the SMTP host, port, sender, and any credentials your SMTP server requires. Use `MAIL_SCHEME=smtps` if your server uses implicit TLS. Single-quote passwords with literal dollar signs.
 
-2. Select the PostgreSQL 18 Compose file. Build the app image and run the migrations before starting the app.
+2. Choose one database for the deployment. The command below uses PostgreSQL 18. For MariaDB 11.8, replace `docker-compose.postgresql.yaml` with `docker-compose.mariadb.yaml`. Both options use the same proxy hostname. Build the app image and run the migrations before starting the app.
 
     ```bash
     compose() {
@@ -70,13 +70,13 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the Docker networ
     compose up --detach --wait
     ```
 
-    Compose keeps Laravel files and database data in named volumes. Keep the same Compose project name and volumes when recreating containers.
+    Compose keeps Laravel files and database data in named volumes. Keep the same Compose file, project name, and volumes when recreating containers.
 
 3. Add a Proxy Host in Nginx Proxy Manager using the hostname from `APP_URL`. Set **Scheme** to `http`, **Forward Hostname / IP** to `laravel-homelab`, and **Forward Port** to `80`. From a NetBird-connected device, open `/up` on your internal host and confirm it returns HTTP 200. Open `/login` to check that the page loads with styling, then exercise registration, 2FA, and password reset. The verification and reset emails should link back to your internal HTTP URL.
 
 ### Homelab upgrades
 
-Back up the named volumes and your runtime configuration before upgrading. From the deployment checkout, define `compose()` as shown in step 2 if you started a new shell. Then run the commands below.
+Back up the named volumes and your runtime configuration before upgrading. From the deployment checkout, define `compose()` as shown in step 2 with the Compose file you used to install. Then run the commands below.
 
 ```bash
 git pull --ff-only &&

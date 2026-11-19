@@ -91,13 +91,15 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
 1. Back up the app before pulling changes. Stop the app first so the database and files reflect the same point in time. This example uses the PostgreSQL project and database names above. For MariaDB, use `mariadb-dump` for the database backup.
 
     ```bash
-    umask 077
-    backup_dir=$(mktemp -d "$HOME/laravel-backup.XXXXXXXX") &&
-        docker compose stop app &&
-        docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml exec -T postgres pg_dump -U postgres -Fc laravel > "$backup_dir/database.dump" &&
-        docker compose run --rm -T --no-deps --entrypoint tar app -czf - -C /var/www/html/storage/app . > "$backup_dir/app-data.tar.gz" &&
-        cp .env "$backup_dir/.env" &&
-        printf 'Backup saved to %s\n' "$backup_dir"
+    (
+        umask 077
+        backup_dir=$(mktemp -d "$HOME/laravel-backup.XXXXXXXX") &&
+            docker compose stop app &&
+            docker compose -p homelab-postgres --env-file .env.postgresql -f compose.postgresql.yaml exec -T postgres pg_dump -U postgres -Fc laravel > "$backup_dir/database.dump" &&
+            docker compose run --rm -T --no-deps --entrypoint tar app -czf - -C /var/www/html/storage/app . > "$backup_dir/app-data.tar.gz" &&
+            cp .env "$backup_dir/.env" &&
+            printf 'Backup saved to %s\n' "$backup_dir"
+    )
     ```
 
     Keep the backup private. The generated key is in `app-data.tar.gz`. A supplied key is in the backed-up `.env`. If the backup fails, run `docker compose start app` to bring the current release back before retrying.

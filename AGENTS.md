@@ -10,6 +10,7 @@ Apply these principles within the assigned role and approved scope. During ticke
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
 - Study how established products solve the problem before designing a solution. Adopt their proven patterns and conventions rather than inventing an approach from scratch.
+- Before creating, changing, or reviewing UI, read [DESIGN.md](./DESIGN.md) for the project's visual and interaction direction; update it alongside deliberate changes to shared design decisions.
 
 ## Agent Development Workflow
 
@@ -102,7 +103,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Conventions
 
-- Before creating, changing, or reviewing UI, read [DESIGN.md](./DESIGN.md) for the project's visual and interaction direction; update it alongside deliberate changes to shared design decisions.
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.

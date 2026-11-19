@@ -8,15 +8,15 @@ import {
     InputOTPGroup,
     InputOTPSlot,
     Spinner,
-} from "@heroui/react";
-import { Form } from "@inertiajs/react";
-import { Check, Copy, ScanLine } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import AlertError from "@/components/alert-error";
-import InputError from "@/components/input-error";
-import { useClipboard } from "@/hooks/use-clipboard";
-import { OTP_MAX_LENGTH } from "@/hooks/use-two-factor-auth";
-import { confirm } from "@/routes/two-factor";
+} from '@heroui/react';
+import { Form } from '@inertiajs/react';
+import { Check, Copy, ScanLine } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import AlertError from '@/components/alert-error';
+import InputError from '@/components/input-error';
+import { useClipboard } from '@/hooks/use-clipboard';
+import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
     return (
@@ -137,12 +137,12 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
-    const [code, setCode] = useState<string>("");
+    const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTimeout(() => {
-            pinInputContainerRef.current?.querySelector("input")?.focus();
+            pinInputContainerRef.current?.querySelector('input')?.focus();
         }, 0);
     }, []);
 
@@ -151,10 +151,10 @@ function TwoFactorVerificationStep({
             {...confirm.form()}
             onSuccess={() => onClose()}
             onError={() => {
-                setCode("");
+                setCode('');
                 setTimeout(() => {
                     pinInputContainerRef.current
-                        ?.querySelector("input")
+                        ?.querySelector('input')
                         ?.focus();
                 }, 0);
             }}
@@ -179,6 +179,8 @@ function TwoFactorVerificationStep({
                             </Label>
                             <InputOTP
                                 variant="secondary"
+                                className="font-mono"
+                                inputClassName="font-mono"
                                 isInvalid={Boolean(
                                     errors?.confirmTwoFactorAuthentication
                                         ?.code,
@@ -273,27 +275,27 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: "Two-factor authentication enabled",
+                title: 'Two-factor authentication enabled',
                 description:
-                    "Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.",
-                buttonText: "Close",
+                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
+                buttonText: 'Close',
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: "Verify authentication code",
+                title: 'Verify authentication code',
                 description:
-                    "Enter the 6-digit code from your authenticator app",
-                buttonText: "Continue",
+                    'Enter the 6-digit code from your authenticator app',
+                buttonText: 'Continue',
             };
         }
 
         return {
-            title: "Enable two-factor authentication",
+            title: 'Enable two-factor authentication',
             description:
-                "To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app",
-            buttonText: "Continue",
+                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
+            buttonText: 'Continue',
         };
     }, [twoFactorEnabled, showVerificationStep]);
 

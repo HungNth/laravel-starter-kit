@@ -6,6 +6,7 @@ import type { AppVariant } from '@/types';
 
 type SidebarState = {
     expanded: boolean;
+    sidebarToggled: boolean;
     mobileOpen: boolean;
     setMobileOpen: (open: boolean) => void;
     toggle: () => void;
@@ -30,6 +31,7 @@ export function AppShell({
 }) {
     const { sidebarOpen } = usePage().props;
     const [expanded, setExpanded] = useState(sidebarOpen);
+    const [sidebarToggled, setSidebarToggled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const isMobile = useIsMobile();
 
@@ -39,6 +41,7 @@ export function AppShell({
         } else {
             const next = !expanded;
             setExpanded(next);
+            setSidebarToggled(true);
             document.cookie = `sidebar_state=${next};path=/;max-age=604800;SameSite=Lax`;
         }
     };
@@ -59,7 +62,15 @@ export function AppShell({
     });
 
     return (
-        <SidebarContext value={{ expanded, mobileOpen, setMobileOpen, toggle }}>
+        <SidebarContext
+            value={{
+                expanded,
+                sidebarToggled,
+                mobileOpen,
+                setMobileOpen,
+                toggle,
+            }}
+        >
             <div
                 className={
                     variant === 'header'

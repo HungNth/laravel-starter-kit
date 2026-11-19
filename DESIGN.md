@@ -28,7 +28,7 @@ The existing light/dark/system choice remains available and persistent. Each vie
 
 ## Typography and identity
 
-- Instrument Sans remains the application font, preserving the starter's existing identity and avoiding another font download.
+- Use Inter for application text. Laravel Vite serves the font and defines `--font-inter` with system sans-serif fallbacks. The application connects it to `font-sans` so HeroUI controls inherit the same font.
 - Existing logos, Lucide icons, English copy, and navigation labels remain. The existing Laravel SVG artwork on Welcome retains its brand colors; surrounding UI uses semantic theme colors. Icons identify existing actions; the same action uses the same icon across layouts.
 - Page and section headings retain the current restrained scale. Descriptions are subordinate to headings, while labels and errors remain readable at normal zoom.
 - Monospace is reserved for authentication codes and recovery codes, where distinguishing characters matters.
@@ -55,7 +55,11 @@ Authentication dialogs retain their titles, initial focus, keyboard dismissal wh
 
 Keyboard access covers navigation, menus, forms, drawers, and dialogs, with visible focus throughout. Icon-only actions have accessible names. Touch controls have sufficient target area and separation. Text contrast targets WCAG AA, and meaning remains understandable without color.
 
-Motion explains a state transition or pending operation and respects reduced-motion preferences. Static dashboard placeholders remain visibly placeholders; future content uses actual application data.
+- Desktop sidebar width and adjacent content move together. Labels fade out before the sidebar narrows and fade in once it reaches its expanded width. Keep them on one line.
+- Drawers, dialogs, and dropdowns use HeroUI’s built-in transitions. Use short CSS transitions for app-owned controls that change layout or visibility.
+- Under reduced motion, sidebar layout and labels update immediately. The password-reset pending indicator stays visible without rotation.
+
+Static dashboard placeholders remain visibly placeholders; future content uses actual application data.
 
 ## Keeping this direction consistent
 

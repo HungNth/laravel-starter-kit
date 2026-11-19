@@ -49,7 +49,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     data-test="email-password-reset-link-button"
                                 >
                                     {processing && (
-                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        <LoaderCircle
+                                            aria-hidden="true"
+                                            className="size-4 animate-spin motion-reduce:animate-none"
+                                        />
                                     )}
                                     Email password reset link
                                 </Button>

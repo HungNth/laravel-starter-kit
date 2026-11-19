@@ -17,28 +17,28 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
 
 1. Clone the `react/heroui` branch from GitHub.
 
-   ```bash
-   git clone --branch react/heroui --single-branch https://github.com/HungNth/laravel-starter-kit.git
-   cd laravel-starter-kit
-   ```
+    ```bash
+    git clone --branch react/heroui --single-branch https://github.com/HungNth/laravel-starter-kit.git
+    cd laravel-starter-kit
+    ```
 
 2. Install dependencies and create your `.env` file.
 
-   ```bash
-   composer install
-   php -r "file_exists('.env') || copy('.env.example', '.env');"
-   php artisan key:generate --no-interaction
-   pnpm install --frozen-lockfile
-   ```
+    ```bash
+    composer install
+    php -r "file_exists('.env') || copy('.env.example', '.env');"
+    php artisan key:generate --no-interaction
+    pnpm install --frozen-lockfile
+    ```
 
 3. Set your database connection in `.env`, then run the migrations and start the app.
 
-   ```bash
-   php artisan migrate --no-interaction
-   composer run dev
-   ```
+    ```bash
+    php artisan migrate --no-interaction
+    composer run dev
+    ```
 
-   Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
+    Open the address Laravel prints in the terminal. The default is `http://localhost:8000`. When you try signing up locally, look for the email verification link in `storage/logs/laravel.log`.
 
 ## Tooling
 
@@ -49,11 +49,11 @@ You'll need Git, Composer, PHP 8.4, Node.js 24 (24.11 or later), and pnpm 12.21.
 
 ### Frontend commands
 
-| Command | What it does |
-| --- | --- |
-| `pnpm run dev` | Start Vite+ on its own. `composer run dev` starts it alongside Laravel. |
-| `pnpm run build` | Build frontend assets for production. |
-| `pnpm run build:ssr` | Build both Inertia's client and SSR bundles. |
-| `pnpm run check` | Check formatting and run the Vite+ linter. |
-| `pnpm run check:fix` | Apply formatting and available lint fixes. |
-| `pnpm run types:check` | Check TypeScript types with `tsc --noEmit`. |
+| Command                | What it does                                                            |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `pnpm run dev`         | Start Vite+ on its own. `composer run dev` starts it alongside Laravel. |
+| `pnpm run build`       | Build frontend assets for production.                                   |
+| `pnpm run build:ssr`   | Build both Inertia's client and SSR bundles.                            |
+| `pnpm run check`       | Check formatting and run the Vite+ linter.                              |
+| `pnpm run check:fix`   | Apply formatting and available lint fixes.                              |
+| `pnpm run types:check` | Check TypeScript types with `tsc --noEmit`.                             |

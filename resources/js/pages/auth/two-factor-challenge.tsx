@@ -73,6 +73,7 @@ export default function TwoFactorChallenge() {
                                         id="recovery_code"
                                         name="recovery_code"
                                         type="text"
+                                        className="font-mono"
                                         placeholder="Enter recovery code"
                                         autoFocus={showRecoveryInput}
                                         required
@@ -97,6 +98,8 @@ export default function TwoFactorChallenge() {
                                         </Label>
                                         <InputOTP
                                             id="code"
+                                            className="font-mono"
+                                            inputClassName="font-mono"
                                             aria-describedby="code-error"
                                             isInvalid={Boolean(errors.code)}
                                             name="code"

@@ -6,12 +6,54 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+@theme inline {
+    --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
 }
 
 @layer base {
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .app-sidebar {
+        --sidebar-resize-duration: 200ms;
+        --sidebar-label-exit-duration: 60ms;
+        transition: width var(--sidebar-resize-duration) ease-in-out;
+    }
+
+    .app-sidebar[data-collapsed] {
+        transition-delay: var(--sidebar-label-exit-duration);
+    }
+
+    .app-sidebar .sidebar-label {
+        white-space: nowrap;
+        transition:
+            opacity 80ms ease-out var(--sidebar-resize-duration),
+            display 80ms allow-discrete;
+    }
+
+    .app-sidebar[data-sidebar-toggled] .sidebar-label {
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    .app-sidebar[data-collapsed] .sidebar-label {
+        display: none;
+        opacity: 0;
+        transition:
+            opacity var(--sidebar-label-exit-duration) ease-out,
+            display var(--sidebar-label-exit-duration) allow-discrete;
+    }
+
+    .app-sidebar,
+    .app-sidebar[data-collapsed],
+    .app-sidebar .sidebar-label,
+    .app-sidebar[data-collapsed] .sidebar-label {
+        @variant motion-reduce {
+            transition: none;
+        }
     }
 }

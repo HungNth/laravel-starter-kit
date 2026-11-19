@@ -16,9 +16,9 @@ export function NavMain({
     const { isCurrentUrl } = useCurrentUrl();
     return (
         <nav aria-label="Platform" className="grid gap-1">
-            {!collapsed && (
-                <p className="px-3 py-2 text-xs text-muted">Platform</p>
-            )}
+            <p className="sidebar-label px-3 py-2 text-xs text-muted">
+                Platform
+            </p>
             {items.map((item) => (
                 <Tooltip key={item.title} isDisabled={!collapsed} delay={0}>
                     <Tooltip.Trigger<'a'>
@@ -36,7 +36,7 @@ export function NavMain({
                                 aria-current={
                                     isCurrentUrl(item.href) ? 'page' : undefined
                                 }
-                                aria-label={collapsed ? item.title : undefined}
+                                aria-label={item.title}
                                 className={cn(
                                     buttonVariants({
                                         variant: isCurrentUrl(item.href)
@@ -44,13 +44,14 @@ export function NavMain({
                                             : 'ghost',
                                     }),
                                     'w-full justify-start',
-                                    collapsed && 'justify-center px-0',
                                 )}
                             >
                                 {item.icon && (
                                     <item.icon className="size-5 shrink-0" />
                                 )}
-                                {!collapsed && <span>{item.title}</span>}
+                                <span className="sidebar-label">
+                                    {item.title}
+                                </span>
                             </Link>
                         )}
                     />

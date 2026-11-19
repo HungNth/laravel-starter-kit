@@ -42,6 +42,10 @@ You'll need Docker Engine with Compose, Nginx Proxy Manager on the `proxy` Docke
     \q
     ```
 
+    To add another app on the same host, use a separate checkout with its own `.env`. Repeat the role and database commands with a new name, such as `notes`, and a different password. Revoke `CONNECT` from `PUBLIC` on each new database so the other app logins cannot connect.
+
+    In the new `.env`, set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` to the new database name, login, and password. Keep `DB_NETWORK`, `DB_HOST`, and `DB_PORT` pointed at the shared PostgreSQL service. Choose a unique `COMPOSE_PROJECT_NAME` and `APP_PROXY_ALIAS`, such as `notes-homelab`, and set `APP_URL` to its own internal HTTP URL. Compose uses the project name to give the app its own `app-data` volume. Add a NetBird DNS record and a Proxy Host for the new hostname.
+
 3. Create the app's `.env` from the deployment example.
 
     ```bash

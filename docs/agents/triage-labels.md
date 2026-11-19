@@ -1,8 +1,8 @@
 # Triage labels
 
-The local tracker uses the default canonical labels without renaming.
+GitHub Issues uses the five default canonical labels.
 
-| Canonical role    | Local status      | Meaning                                          |
+| Canonical role    | GitHub label      | Meaning                                          |
 | ----------------- | ----------------- | ------------------------------------------------ |
 | `needs-triage`    | `needs-triage`    | A maintainer needs to evaluate the issue.        |
 | `needs-info`      | `needs-info`      | More information is required.                    |
@@ -10,4 +10,4 @@ The local tracker uses the default canonical labels without renaming.
 | `ready-for-human` | `ready-for-human` | Implementation requires a human.                 |
 | `wontfix`         | `wontfix`         | The issue will not be actioned.                  |
 
-Skills apply the matching string to the file's `Status:` field. Triage readiness does not replace the project's delivery approval requirement.
+Use the matching GitHub label when a skill names a triage role. Delivery requires separate user approval.

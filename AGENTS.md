@@ -55,7 +55,7 @@ Do not turn tickets into implementation scripts with unnecessary file paths or l
 
 ### Issue tracker
 
-Specs and issues use local Markdown under `.scratch/`. See [issue-tracker.md](docs/agents/issue-tracker.md).
+Specs and tickets use GitHub Issues via `gh`. See [issue-tracker.md](docs/agents/issue-tracker.md) before reading or publishing issues.
 
 ### Triage labels
 

@@ -23,9 +23,13 @@ export function NavUser({
                 aria-label="Account menu"
                 data-test="sidebar-menu-button"
             >
-                <UserInfo user={auth.user} compact={collapsed} />
+                <UserInfo
+                    user={auth.user}
+                    compact={collapsed}
+                    detailsClassName="sidebar-label"
+                />
                 {!collapsed && (
-                    <ChevronsUpDown className="ml-auto size-4 shrink-0" />
+                    <ChevronsUpDown className="sidebar-label ml-auto size-4 shrink-0" />
                 )}
             </Button>
             <Dropdown.Popover placement="bottom end" className="w-64">

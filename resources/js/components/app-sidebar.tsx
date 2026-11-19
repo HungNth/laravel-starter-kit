@@ -1,25 +1,24 @@
-import { Drawer } from "@heroui/react";
-import { Link } from "@inertiajs/react";
-import { BookOpen, FolderGit2, LayoutGrid } from "lucide-react";
-import AppLogo from "@/components/app-logo";
-import AppLogoIcon from "@/components/app-logo-icon";
-import { useAppSidebar } from "@/components/app-shell";
-import { NavFooter } from "@/components/nav-footer";
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
-import { cn } from "@/lib/utils";
-import { dashboard } from "@/routes";
+import { Drawer } from '@heroui/react';
+import { Link } from '@inertiajs/react';
+import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import AppLogo from '@/components/app-logo';
+import { useAppSidebar } from '@/components/app-shell';
+import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
+import { cn } from '@/lib/utils';
+import { dashboard } from '@/routes';
 
-const mainItems = [{ title: "Dashboard", href: dashboard(), icon: LayoutGrid }];
+const mainItems = [{ title: 'Dashboard', href: dashboard(), icon: LayoutGrid }];
 const footerItems = [
     {
-        title: "Repository",
-        href: "https://github.com/HungNth/laravel-starter-kit",
+        title: 'Repository',
+        href: 'https://github.com/HungNth/laravel-starter-kit',
         icon: FolderGit2,
     },
     {
-        title: "Documentation",
-        href: "https://github.com/HungNth/laravel-starter-kit#readme",
+        title: 'Documentation',
+        href: 'https://github.com/HungNth/laravel-starter-kit#readme',
         icon: BookOpen,
     },
 ];
@@ -40,11 +39,7 @@ function SidebarContent({
                 aria-label="Dashboard"
                 className="flex h-12 items-center gap-2 rounded-lg px-2 focus-visible:outline-2 focus-visible:outline-focus"
             >
-                {collapsed ? (
-                    <AppLogoIcon className="size-8 fill-current" />
-                ) : (
-                    <AppLogo />
-                )}
+                <AppLogo compact={collapsed} />
             </Link>
             <NavMain
                 items={mainItems}
@@ -53,22 +48,25 @@ function SidebarContent({
             />
             <div className="mt-auto grid gap-3">
                 <NavFooter items={footerItems} collapsed={collapsed} />
-                <NavUser collapsed={collapsed} onNavigate={onNavigate} />
+                <NavUser onNavigate={onNavigate} />
             </div>
         </>
     );
 }
 
 export function AppSidebar() {
-    const { expanded, mobileOpen, setMobileOpen } = useAppSidebar();
+    const { expanded, sidebarToggled, mobileOpen, setMobileOpen } =
+        useAppSidebar();
     return (
         <>
             <aside
                 id="app-sidebar"
                 aria-label="Main navigation"
+                data-collapsed={expanded ? undefined : ''}
+                data-sidebar-toggled={sidebarToggled ? '' : undefined}
                 className={cn(
-                    "sticky top-0 hidden h-svh shrink-0 flex-col gap-4 bg-surface p-2 md:flex",
-                    expanded ? "w-64" : "w-16",
+                    'app-sidebar sticky top-0 hidden h-svh shrink-0 flex-col gap-4 overflow-x-clip bg-surface p-2 md:flex',
+                    expanded ? 'w-64' : 'w-16',
                 )}
             >
                 <SidebarContent collapsed={!expanded} />

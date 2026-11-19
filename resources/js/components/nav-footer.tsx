@@ -19,14 +19,11 @@ export function NavFooter({
                         href={toUrl(item.href)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={collapsed ? item.title : undefined}
-                        className={cn(
-                            'flex gap-2 px-3 py-2 text-sm text-muted',
-                            collapsed && 'justify-center px-0',
-                        )}
+                        aria-label={item.title}
+                        className="flex gap-2 px-3 py-2 text-sm text-muted"
                     >
                         {item.icon && <item.icon className="size-5 shrink-0" />}
-                        {!collapsed && item.title}
+                        <span className="sidebar-label">{item.title}</span>
                     </Link>
                     <Tooltip.Content placement="right">
                         {item.title}
